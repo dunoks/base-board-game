@@ -73,8 +73,8 @@ export default function GamePage() {
 
   if (!isSDKReady) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-950">
-        <div className="animate-spin text-blue-500">
+      <div className="flex items-center justify-center h-screen bg-blue-50">
+        <div className="animate-spin text-blue-600">
           <RefreshCw size={48} />
         </div>
       </div>
@@ -82,31 +82,36 @@ export default function GamePage() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-start p-4 min-h-screen max-w-md mx-auto">
+    <main className="flex flex-col items-center justify-start p-6 min-h-screen max-w-md mx-auto bg-blue-50">
       {/* Header */}
-      <div className="w-full flex justify-between items-center mb-6 pt-4">
-        <h1 className="text-2xl font-bold font-sans tracking-tight text-white flex items-center gap-2">
-          <span className="text-blue-500"><Compass /></span> Base Quest
-        </h1>
-        <div className="bg-slate-900 px-4 py-2 rounded-full border border-slate-800 flex items-center gap-2">
-          <Trophy size={18} className="text-yellow-500" />
-          <span className="font-mono font-bold">{score}</span>
+      <div className="w-full flex justify-between items-center mb-8 pt-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-neo">
+            <Compass className="text-white" size={20} />
+          </div>
+          <h1 className="text-2xl font-black text-blue-900 tracking-tight leading-none">
+            BASE QUEST
+          </h1>
+        </div>
+        <div className="bg-yellow-100 border-2 border-yellow-400 px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
+          <Trophy size={18} className="text-yellow-600" />
+          <span className="font-mono font-black text-yellow-800">{score}</span>
         </div>
       </div>
 
       {/* Identity Card Mini */}
       {address && (
-        <div className="w-full mb-6">
+        <div className="w-full mb-8">
           <IdentityCard 
             address={address} 
-            className="rounded-xl border border-blue-500/30 bg-blue-500/5 backdrop-blur-sm shadow-xl"
+            className="rounded-[32px] border-4 border-blue-100 bg-white shadow-sm overflow-hidden"
           />
         </div>
       )}
 
       {/* Game Board */}
       <div 
-        className="relative bg-slate-900/50 p-2 rounded-2xl border border-slate-800 shadow-inner grid gap-1"
+        className="relative bg-white p-2 rounded-[48px] border-8 border-white shadow-2xl grid gap-2"
         style={{ 
           gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
           width: '100%',
@@ -115,7 +120,7 @@ export default function GamePage() {
       >
         {/* Background Grid */}
         {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => (
-          <div key={i} className="bg-slate-800/30 rounded-md border border-slate-700/20" />
+          <div key={i} className="bg-blue-50/50 rounded-xl border border-blue-100" />
         ))}
 
         {/* Items */}
@@ -135,9 +140,9 @@ export default function GamePage() {
               }}
             >
               {item.type === 'gem' ? (
-                <div className="bg-blue-500 w-4 h-4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse" />
+                <div className="bg-blue-600 w-5 h-5 rounded-lg border-2 border-blue-400 rotate-12 shadow-[0_0_15px_rgba(37,99,235,0.4)] animate-pulse" />
               ) : (
-                <Zap className="text-yellow-400 w-6 h-6 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+                <Zap className="text-yellow-500 w-8 h-8 drop-shadow-[2px_2px_0px_rgba(234,179,8,0.3)]" />
               )}
             </motion.div>
           ))}
@@ -156,14 +161,14 @@ export default function GamePage() {
             height: `${100 / GRID_SIZE}%`
           }}
         >
-          <div className="bg-white w-full h-full rounded-lg shadow-2xl flex items-center justify-center transform scale-90 border-2 border-blue-500 overflow-hidden">
-             <User className="text-blue-500" />
+          <div className="bg-blue-600 w-full h-full rounded-2xl shadow-xl flex items-center justify-center border-4 border-white overflow-hidden">
+             <User className="text-white" size={24} />
           </div>
         </motion.div>
       </div>
 
       {/* Controls */}
-      <div className="mt-8 grid grid-cols-3 gap-4">
+      <div className="mt-10 grid grid-cols-3 gap-6">
         <div />
         <ControlButton onClick={() => movePlayer(0, -1)} direction="up" />
         <div />
@@ -173,8 +178,10 @@ export default function GamePage() {
       </div>
 
       {/* Footer Info */}
-      <div className="mt-12 text-center opacity-40 text-xs font-mono uppercase tracking-widest">
-        Mission: Collect Base Gems
+      <div className="mt-12 mb-8 bg-blue-100 rounded-2xl px-6 py-3 border-2 border-blue-200">
+        <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
+          Mission: Collect Base Gems
+        </span>
       </div>
     </main>
   );
@@ -184,12 +191,14 @@ function ControlButton({ onClick, direction }: { onClick: () => void, direction:
   return (
     <button 
       onClick={onClick}
-      className="bg-slate-900 border border-slate-800 p-4 rounded-2xl active:bg-blue-600 transition-colors shadow-lg"
+      className="bg-white border-b-4 border-blue-800 p-5 rounded-2xl shadow-lg active:border-b-0 active:translate-y-1 transition-all hover:bg-blue-50 group border-x-2 border-t-2 border-blue-600"
     >
-      {direction === 'up' && <RefreshCw className="rotate-0" />}
-      {direction === 'down' && <RefreshCw className="rotate-180" />}
-      {direction === 'left' && <RefreshCw className="-rotate-90" />}
-      {direction === 'right' && <RefreshCw className="rotate-90" />}
+      <div className="text-blue-600 group-active:text-blue-800">
+        {direction === 'up' && <RefreshCw className="rotate-0" />}
+        {direction === 'down' && <RefreshCw className="rotate-180" />}
+        {direction === 'left' && <RefreshCw className="-rotate-90" />}
+        {direction === 'right' && <RefreshCw className="rotate-90" />}
+      </div>
       <span className="sr-only">{direction}</span>
     </button>
   );

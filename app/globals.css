@@ -7,16 +7,25 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: #020617;
-  color: #f8fafc;
+  background-color: #eff6ff; /* blue-50 */
+  color: #1e3a8a; /* blue-900 */
   overflow-x: hidden;
 }
 
 /* Base Blue Brand Color */
 .text-base-blue {
-  color: #0052FF;
+  color: #2563eb; /* blue-600 */
 }
 
 .bg-base-blue {
-  background-color: #0052FF;
+  background-color: #2563eb; /* blue-600 */
+}
+
+/* Neobrutalist Shadow Utility */
+.shadow-neo {
+  box-shadow: 4px 4px 0px 0px rgba(0, 82, 255, 0.2);
+}
+
+.shadow-neo-active {
+  box-shadow: 0px 0px 0px 0px rgba(0, 82, 255, 0.2);
 }
