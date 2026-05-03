@@ -3,19 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.ts",
     "build": "next build",
-    "start": "next start",
+    "start": "node server.ts",
     "lint": "eslint ."
   },
   "dependencies": {
-    "@farcaster/miniapp-sdk": "latest",
     "@coinbase/onchainkit": "latest",
-    "viem": "latest",
-    "wagmi": "latest",
-    "@tanstack/react-query": "latest",
+    "@farcaster/miniapp-sdk": "latest",
     "@google/genai": "^1.17.0",
     "@hookform/resolvers": "^5.2.1",
+    "@tanstack/react-query": "latest",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -25,7 +23,11 @@
     "postcss": "^8.5.6",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "tailwind-merge": "^3.3.1"
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.3.1",
+    "viem": "latest",
+    "wagmi": "latest"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.11",

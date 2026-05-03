@@ -13,11 +13,59 @@ const INITIAL_PLAYER_POS = { x: 0, y: 0 };
 type Position = { x: number; y: number };
 type Item = { id: string; type: 'gem' | 'powerup' | 'hazard'; pos: Position };
 
+type QuestType = 'collect_gems' | 'visit_coords';
+interface Quest {
+  id: string;
+  title: string;
+  description: string;
+  type: QuestType;
+  targetCount?: number;
+  targetPos?: Position;
+  progress: number;
+  completed: boolean;
+  reward: number;
+}
+
+const INITIAL_QUESTS: Quest[] = [
+  {
+    id: 'q1',
+    title: 'Gem Hunter I',
+    description: 'Collect 3 Gems',
+    type: 'collect_gems',
+    targetCount: 3,
+    progress: 0,
+    completed: false,
+    reward: 100,
+  },
+  {
+    id: 'q2',
+    title: 'Pathfinder I',
+    description: 'Visit the corner (7, 7)',
+    type: 'visit_coords',
+    targetPos: { x: 7, y: 7 },
+    progress: 0,
+    completed: false,
+    reward: 150,
+  },
+  {
+    id: 'q3',
+    title: 'Center Scout',
+    description: 'Find the middle square (4, 4)',
+    type: 'visit_coords',
+    targetPos: { x: 4, y: 4 },
+    progress: 0,
+    completed: false,
+    reward: 50,
+  }
+];
+
 export default function GamePage() {
   const [isSDKReady, setIsSDKReady] = useState(false);
   const [playerPos, setPlayerPos] = useState<Position>(INITIAL_PLAYER_POS);
   const [score, setScore] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
+  const [quests, setQuests] = useState<Quest[]>(INITIAL_QUESTS);
+  const [gemsCollected, setGemsCollected] = useState(0);
   const { address } = useAccount();
 
   // Initialize SDK
@@ -28,6 +76,37 @@ export default function GamePage() {
     };
     initSDK();
   }, []);
+
+  // Quest checking logic
+  useEffect(() => {
+    setQuests(currentQuests => 
+      currentQuests.map(quest => {
+        if (quest.completed) return quest;
+
+        let newProgress = quest.progress;
+        let isNowCompleted = false;
+
+        if (quest.type === 'collect_gems') {
+          newProgress = gemsCollected;
+          if (newProgress >= (quest.targetCount || 0)) {
+            isNowCompleted = true;
+          }
+        } else if (quest.type === 'visit_coords') {
+          if (playerPos.x === quest.targetPos?.x && playerPos.y === quest.targetPos?.y) {
+            newProgress = 1;
+            isNowCompleted = true;
+          }
+        }
+
+        if (isNowCompleted) {
+          setScore(s => s + quest.reward);
+          return { ...quest, progress: newProgress, completed: true };
+        }
+
+        return { ...quest, progress: newProgress };
+      })
+    );
+  }, [gemsCollected, playerPos]);
 
   // Spawn items
   const spawnItem = useCallback(() => {
@@ -62,7 +141,10 @@ export default function GamePage() {
       // Check for collisions with items
       const collidedItem = items.find(item => item.pos.x === newX && item.pos.y === newY);
       if (collidedItem) {
-        if (collidedItem.type === 'gem') setScore(s => s + 10);
+        if (collidedItem.type === 'gem') {
+          setScore(s => s + 10);
+          setGemsCollected(g => g + 1);
+        }
         if (collidedItem.type === 'powerup') setScore(s => s + 50);
         setItems(prevItems => prevItems.filter(i => i.id !== collidedItem.id));
       }
@@ -124,7 +206,7 @@ export default function GamePage() {
         ))}
 
         {/* Items */}
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {items.map(item => (
             <motion.div
               key={item.id}
@@ -177,7 +259,57 @@ export default function GamePage() {
         <ControlButton onClick={() => movePlayer(1, 0)} direction="right" />
       </div>
 
-      {/* Footer Info */}
+      {/* Quest Section */}
+      <div className="w-full mt-12 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-black text-blue-900 tracking-tight flex items-center gap-2">
+            <Shield className="text-blue-600" size={20} /> ONCHAIN QUESTS
+          </h2>
+          <span className="text-xs font-bold text-blue-400 bg-blue-100 px-2 py-1 rounded-lg">
+            {quests.filter(q => q.completed).length} / {quests.length}
+          </span>
+        </div>
+        
+        <div className="space-y-3">
+          {quests.map(quest => (
+            <motion.div 
+              key={quest.id}
+              layout
+              className={`p-4 rounded-3xl border-2 transition-all ${
+                quest.completed 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-white border-blue-100 shadow-sm'
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className={`font-black text-sm ${quest.completed ? 'text-green-700' : 'text-blue-900'}`}>
+                    {quest.title} {quest.completed && '✓'}
+                  </h3>
+                  <p className="text-xs text-blue-500 font-medium">{quest.description}</p>
+                </div>
+                {!quest.completed && (
+                  <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-1 rounded-lg">
+                    +{quest.reward}
+                  </span>
+                )}
+              </div>
+              
+              {!quest.completed && quest.type === 'collect_gems' && (
+                <div className="w-full h-2 bg-blue-50 rounded-full overflow-hidden border border-blue-100">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(quest.progress / (quest.targetCount || 1)) * 100}%` }}
+                    className="h-full bg-blue-600"
+                  />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mission Badge */}
       <div className="mt-12 mb-8 bg-blue-100 rounded-2xl px-6 py-3 border-2 border-blue-200">
         <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
           Mission: Collect Base Gems
